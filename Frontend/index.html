@@ -120,6 +120,8 @@
 
     // Function to save the modified playlist
     document.getElementById("saveBtn").addEventListener("click", () => {
+      //const absolute_path = '/home/humaidan/Downloads/playlist_manager/playlists'
+      //const modifiedContent = playlistContent.map(name => `${absolute_path}/${name}`).join("\n");
       const modifiedContent = playlistContent.join("\n");
 
     fetch('/overwrite-playlist', {
