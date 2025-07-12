@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Edit Playlist</title>
+  <style>
+    .playlist-item {
+      cursor: pointer;
+      padding: 5px;
+      margin: 5px 0;
+      background-color: #f1f1f1;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      display: flex;
+      justify-content: space-between;
+    }
+    .move-btns {
+      display: flex;
+      gap: 5px;
+    }
+  </style>
+</head>
+<body>
+  <h2>Edit Playlist .m3u File</h2>
+  <input type="file" id="fileInput" accept=".m3u">
+  <button id="saveBtn" style="display:none;">Save Playlist</button>
+  
+  <div id="playlistContainer"></div>
+
+  <pre id="output"></pre>
+
+  <script>
+    let playlistContent = [];
+
+    // UBNUTU 22.04.4 ESXI 6.5X
+
+    // Function to handle file reading
+    document.getElementById("fileInput").addEventListener("change", (event) => {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+
+      reader.onload = function(e) {
+        const content = e.target.result;
+        playlistContent = content.split("\n"); // Split by line to get each video name
+        displayPlaylist();
+        document.getElementById("saveBtn").style.display = "inline";
+      };
+
+      reader.readAsText(file);
+    });
+
+    // Function to display the playlist in the UI
+    function displayPlaylist() {
+      const container = document.getElementById("playlistContainer");
+      container.innerHTML = ""; // Clear any existing playlist items
+      playlistContent.forEach((video, index) => {
+        const item = document.createElement("div");
+        item.className = "playlist-item";
+        item.setAttribute("draggable", true);
+        item.textContent = video;
+
+        // Buttons for moving videos up or down
+        const buttons = document.createElement("div");
+        buttons.className = "move-btns";
+        
+        const moveUpBtn = document.createElement("button");
+        moveUpBtn.textContent = "↑";
+        moveUpBtn.onclick = () => moveVideo(index, "up");
+        
+        const moveDownBtn = document.createElement("button");
+        moveDownBtn.textContent = "↓";
+        moveDownBtn.onclick = () => moveVideo(index, "down");
+
+        buttons.appendChild(moveUpBtn);
+        buttons.appendChild(moveDownBtn);
+        item.appendChild(buttons);
+        
+        // Drag and drop functionality
+        item.addEventListener("dragstart", (e) => {
+          e.dataTransfer.setData("text/plain", index); // Store index of dragged item
+        });
+
+        item.addEventListener("dragover", (e) => {
+          e.preventDefault(); // Allow drop
+        });
+
+        item.addEventListener("drop", (e) => {
+          e.preventDefault();
+          const draggedIndex = e.dataTransfer.getData("text/plain");
+          if (draggedIndex !== index) {
+            swapVideos(draggedIndex, index);
+          }
+        });
+
+        container.appendChild(item);
+      });
+    }
+
+    // Function to swap two videos in the playlist
+    function swapVideos(index1, index2) {
+      [playlistContent[index1], playlistContent[index2]] = [playlistContent[index2], playlistContent[index1]];
+      displayPlaylist(); // Re-render the playlist
+    }
+
+    // Function to move a video up or down in the playlist
+    function moveVideo(index, direction) {
+      if (direction === "up" && index > 0) {
+        swapVideos(index, index - 1);
+      } else if (direction === "down" && index < playlistContent.length - 1) {
+        swapVideos(index, index + 1);
+      }
+    }
+
+    // Function to save the modified playlist
+    document.getElementById("saveBtn").addEventListener("click", () => {
+      const modifiedContent = playlistContent.join("\n");
+      const blob = new Blob([modifiedContent], { type: "application/vnd.apple.mpegurl" });
+
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = "playlist.m3u8";
+      link.click();
+    });
+  </script>
+
+</body>
+</html>
