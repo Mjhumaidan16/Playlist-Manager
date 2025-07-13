@@ -11,7 +11,7 @@ const server = http.createServer((req, res) => {
 
 if (req.method == 'GET'){
 
-const filePath = req.url == '/' ? 'index.html' : req.url;
+const filePath = req.url == '/' ? 'index2.html' : req.url;
 const fullPath = path.join(__dirname, 'Frontend', filePath);
 
 fs.readFile(fullPath, (err, data) => {
