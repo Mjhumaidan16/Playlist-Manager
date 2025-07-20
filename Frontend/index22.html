@@ -27,18 +27,15 @@
     <div id="playlist" class="bg-white rounded-2xl shadow p-6 border border-gray-200">
       <h2 class="text-2xl font-bold mb-4 border-b pb-2">🎬 Playlist Editor</h2>
 
-
-      <!-- File Upload -->
       <label class="block mb-3 font-semibold">Upload .m3u8 File</label>
       <input id="fileInput" type="file" accept=".m3u8"
       class="mb-4 w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-400" />
     
-       <!-- Search input -->
+
       <div class="flex items-center justify-between gap-5 mb-3">
         <input type="text" id="searchInput" placeholder="Search..."
                class="flex-1 p-2 border rounded" />
       
-      <!-- Limit dropdown -->
         <div class="flex items-center gap-3">
           <label for="limitSelect" class="font-semibold">Show:</label>
           <select id="limitSelect" class="p-2 border rounded">
@@ -54,7 +51,6 @@
 
       <div id="playlistContainer" class="space-y-1 max-h-96 overflow-y-auto"></div>
 
-      <!-- Save Button (hidden until a file is uploaded) -->
       <button id="saveBtn" class="mt-4 hidden bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
         💾 Save Playlist
       </button>
@@ -88,23 +84,104 @@
         <button onclick="switchScene('Scene 2')" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">Scene 2</button>
       </div>
 
-      <!-- Output for status messages -->
       <div id="output"></div>
+  </div>
+
+  <!-- Streaming Control -->
+<div id="streaming" class="bg-white rounded-2xl shadow p-6 border border-gray-200">
+  <h2 class="text-2xl font-bold mb-4 border-b pb-2">📡 Streaming Control</h2>
+
+  <!-- Status -->
+  <div id="streamingStatus" class="flex items-center gap-2 text-red-600 mb-4 font-medium">
+    <div class="w-3 h-3 bg-red-600 rounded-full animate-pulse"></div>
+    <span>Streaming Stopped</span>
+  </div>
+
+  <!-- Stream Buttons -->
+  <div class="flex gap-4 mb-6">
+    <button id="startStreamBtn" onclick="startStreaming()"
+            class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+      ▶️ Start Streaming
+    </button>
+    <button id="stopStreamBtn" onclick="stopStreaming()" disabled
+            class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+      ⏹ Stop Streaming
+    </button>
+    <button onclick="refreshStatus()"
+            class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded">
+      🔄 Refresh Status
+    </button>
+  </div>
+
+  <!-- Configuration -->
+  <div class="space-y-4">
+    <div>
+      <label for="streamMode" class="block font-semibold mb-1">Stream Mode</label>
+      <select id="streamMode" onchange="onStreamModeChange()"
+              class="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-400">
+        <option value="playlist">Playlist Streaming</option>
+        <option value="custom">Custom Live Stream (VMix)</option>
+      </select>
     </div>
+
+    <div id="playlistModeConfig" class="space-y-3">
+      <div>
+        <label for="streamingPlaylist" class="block font-semibold mb-1">Select Playlist</label>
+        <select id="streamingPlaylist"
+                class="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-400">
+          <option value="">Choose a playlist...</option>
+        </select>
+      </div>
+      <div>
+        <label for="playlistStreamKey" class="block font-semibold mb-1">YouTube Stream Key (Playlist)</label>
+        <input type="password" id="playlistStreamKey" placeholder="Enter your key"
+               class="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-400" />
+      </div>
+    </div>
+
+    <div id="customModeConfig" class="space-y-3 hidden">
+      <div>
+        <label for="customStreamKey" class="block font-semibold mb-1">YouTube Stream Key (Custom)</label>
+        <input type="password" id="customStreamKey" placeholder="Enter your key"
+               class="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-400" />
+      </div>
+      <div>
+        <label for="vmixSettings" class="block font-semibold mb-1">VMix Settings</label>
+        <textarea id="vmixSettings" rows="3" placeholder="Optional settings"
+                  class="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"></textarea>
+      </div>
+    </div>
+
+    <div class="bg-blue-100 border border-blue-300 p-3 rounded mt-4 text-blue-700">
+      <strong>Current Configuration:</strong>
+      <span id="streamConfigStatus">Playlist mode - No playlist selected</span>
+    </div>
+
+    <div class="flex gap-4">
+      <button onclick="updateStreamConfiguration()"
+              class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+        ✅ Update Configuration
+      </button>
+      <button onclick="switchStreamMode()"
+              class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
+        🔁 Quick Switch Mode
+      </button>
+    </div>
+  </div>
+</div>
+
 
   </div>
 
   <script>
-    let playlistContent = []; // Stores loaded playlist lines
-    let draggedIndex = null;
+    let playlistContent = [];
 
-      // Handle file upload
     document.getElementById("fileInput").addEventListener("change", (event) => {
       const file = event.target.files[0];
       if (!file) return;
       const reader = new FileReader();
       reader.onload = function(e) {
-        playlistContent = e.target.result.split("\n"); // Split lines
+        playlistContent = e.target.result.split("\n");
         displayPlaylist();
         document.getElementById("saveBtn").style.display = "inline-block";
         document.getElementById("toggleAddBtn").style.display = "inline-block";
@@ -112,28 +189,23 @@
       reader.readAsText(file);
     });
 
-      // Handle dropdown limit change
     document.getElementById("limitSelect").addEventListener("change", () => {
       displayPlaylist(document.getElementById("searchInput").value, document.getElementById("limitSelect").value);
     });
 
-      // Handle search input
     document.getElementById("searchInput").addEventListener("input", (e) => {
       displayPlaylist(e.target.value);
     });
 
-      // Toggle Add Video form visibility
     document.getElementById("toggleAddBtn").addEventListener("click", () => {
       const box = document.getElementById("addVideoBox");
       box.classList.toggle("hidden");
     });
 
-     // Normalize text for comparison (search case-insensitive)
     function normalize(text) {
       return text.normalize('NFKC').toLowerCase();
     }
 
-      // Display playlist with filter and limit
     function displayPlaylist(filter = "", limit = "all") {
       const container = document.getElementById("playlistContainer");
       container.innerHTML = "";
@@ -155,41 +227,7 @@
 
         const buttons = document.createElement("div");
         buttons.className = "flex gap-1";
-        item.setAttribute("draggable", "true"); // ✅ This is required!
 
-
-          // Track index for drag logic
-    item.dataset.index = i;
-
-    // 🎯 Drag and Drop Events
-item.ondragstart = (e) => {
-  draggedIndex = parseInt(item.dataset.index);
-  item.classList.add("opacity-50"); // Optional visual feedback
-};
-
-item.ondragend = () => {
-  draggedIndex = null;
-  item.classList.remove("opacity-50");
-};
-
-item.ondragover = (e) => {
-  e.preventDefault(); // Required to allow dropping
-  item.classList.add("ring", "ring-blue-300"); // Optional highlight
-};
-
-item.ondragleave = () => {
-  item.classList.remove("ring", "ring-blue-300");
-};
-
-item.ondrop = () => {
-  const targetIndex = parseInt(item.dataset.index);
-  if (draggedIndex !== null && draggedIndex !== targetIndex) {
-    swapVideos(draggedIndex, targetIndex);
-  }
-  item.classList.remove("ring", "ring-blue-300");
-};
-
-        // Edit button
         const editBtn = document.createElement("button");
         editBtn.title = "Edit";
         editBtn.textContent = "✏️";
@@ -202,8 +240,6 @@ item.ondrop = () => {
           }
         };
 
-
-      // Delete button
         const deleteBtn = document.createElement("button");
         deleteBtn.title = "Delete";
         deleteBtn.textContent = "🗑️";
@@ -215,7 +251,6 @@ item.ondrop = () => {
           }
         };
 
-           // Move Up/Down buttons
         const moveUpBtn = document.createElement("button");
         moveUpBtn.title = "Move Up";
         moveUpBtn.textContent = "↑";
@@ -239,13 +274,11 @@ item.ondrop = () => {
       }
     }
 
-     // Swap two playlist items
     function swapVideos(index1, index2) {
       [playlistContent[index1], playlistContent[index2]] = [playlistContent[index2], playlistContent[index1]];
       displayPlaylist(document.getElementById("searchInput").value, document.getElementById("limitSelect").value);
     }
 
-     // Move video up or down
     function moveVideo(index, direction) {
       if (direction === "up" && index > 0) {
         swapVideos(index, index - 1);
@@ -254,8 +287,6 @@ item.ondrop = () => {
       }
     }
 
-
-  // Add new video to playlist with validation
     function addVideoToPlaylist() {
   const input = document.getElementById("newVideoInput");
   const videoName = input.value.trim();
@@ -278,7 +309,7 @@ item.ondrop = () => {
 }
 
 
-  // Save playlist to server via POST
+
     document.getElementById("saveBtn").addEventListener("click", () => {
       const modifiedContent = playlistContent.join("\n");
       fetch('/overwrite-playlist', {
@@ -294,9 +325,6 @@ item.ondrop = () => {
       .catch(err => alert('Error saving playlist: ' + err.message));
     });
 
-
-
-  // Send scene switch request to server
     function switchScene(scene) {
       fetch('/switch-scene', {
         method: 'POST',
