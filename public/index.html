@@ -93,11 +93,6 @@
   <div id="obs" class="bg-white rounded-2xl shadow p-6 border border-gray-200">
     <h2 class="text-2xl font-bold mb-4 border-b pb-2">🎥 OBS Scene Control</h2>
 
-    <label class="block mb-3 font-semibold">Insert the websocket pass</label>
-    <input id="obsPassword" type="password" placeholder="OBS Password" class="mb-4 w-80 p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-400">
-    <button onclick="submitPassword()">Connect</button>
-
-
     <label class="block mb-3 font-semibold">Change Scene</label>
       <div class="space-x-3 mb-6">
         <button onclick="switchScene('Scene 1')" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">Scene 1</button>
@@ -119,49 +114,42 @@
     <span>Streaming Stopped</span>
   </div>
 
-  <!-- Stream Buttons -->
-  <div class="flex gap-4 mb-6">
+  <!-- Stream Control Section -->
+<div class="space-y-5">
+
+  <!-- Buttons -->
+  <div class="flex flex-wrap gap-4">
     <button id="startStreamBtn" onclick="startStreaming()"
-            class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+            class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded">
       ▶️ Start Streaming
     </button>
+
     <button id="stopStreamBtn" onclick="stopStreaming()" disabled
-            class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+            class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-6 rounded disabled:opacity-50">
       ⏹ Stop Streaming
     </button>
+
     <button onclick="refreshStatus()"
-            class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded">
+            class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-6 rounded">
       🔄 Refresh Status
     </button>
+
+  <!-- Status Info -->
+
+    <!-- Uptime -->
+    <div class="items-center p-2 border rounded bg-gray-100 shadow-sm">
+      <span class="text-sm font-semibold text-gray-600">⏱ Uptime</span>
+      <span id="uptime" class="text-lg font-bold text-gray-800">00:00:00</span>
+    </div>
+
+    <!-- Bitrate / FPS -->
+    <div class="items-center p-2 border rounded bg-gray-100 shadow-sm">
+      <span class="text-sm font-semibold text-gray-600">📈 Bitrate / FPS</span>
+      <span id="bitrateInfo" class="text-lg font-bold text-gray-800">N/A</span>
+    </div>
   </div>
 
-  <!-- Configuration -->
-  <div class="space-y-4">
-    <div>
-
-         <div>
-        <label for="customStreamKey" class="block font-semibold mb-1">YouTube Stream Url</label>
-        <input type="password" id="customStreamKey1" placeholder="Enter your key"
-               class="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-400" />
-      </div>
-
-      <div>
-        <label for="playlistStreamKey" class="block font-semibold mb-1">YouTube Stream Key</label>
-        <input type="password" id="playlistStreamKey" placeholder="Enter your key"
-               class="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-400" />
-      </div>
-    </div>
-
-    <div class="flex gap-4" >
-      <button onclick="updateStreamConfiguration()"
-              class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-        ✅ Update Configuration
-      </button>
-      <button onclick="switchStreamMode()"
-              class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
-        🔁 Quick Switch Mode
-      </button>
-    </div>
+</div>
   </div>
 </div>
 

@@ -205,28 +205,6 @@ document.getElementById("saveBtn").addEventListener("click", () => {
   .catch(err => alert('Error saving playlist: ' + err.message));
 });
 
-async function submitPassword (){
-
-    const password = document.getElementById('obsPassword').value;
-    if (!password) return alert('Password is required.');
-    // Save temporarily in sessionStorage
-    sessionStorage.setItem('obsPassword', password);
-    console.log(password);
-
-     // Send to backend
-     const res = await fetch('/api/obs-password', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password })
-      });
-
-      if (res.ok) {
-        alert('Password sent successfully.');
-      } else {
-        alert('Failed to send password.');
-      }
-    }
-
 
  document.getElementById("checkDuration").addEventListener("click", async () => {
   try {
@@ -256,8 +234,6 @@ document.getElementById("checkMismatch").addEventListener("click", async () => {
 
 
 
-
-
 // Send scene switch request to server
 function switchScene(scene) {
   fetch('/switch-scene', {
@@ -268,4 +244,104 @@ function switchScene(scene) {
   .then(res => res.text())
   .then(alert)
   .catch(err => alert("Error: " + err.message));
+}
+
+
+
+async function startStreaming() {
+  const btn = document.getElementById('startStreamBtn');
+
+  try {
+    const response = await fetch('/start-stream', { method: 'POST' });
+    const result = await response.json(); // <-- parse JSON here
+     btn.disabled = true;
+    btn.innerText = "⏳ Starting...";
+    if (result.success) {
+      document.getElementById('startStreamBtn').disabled = true;
+      document.getElementById('stopStreamBtn').disabled = false;
+      console.log("Streaming started");
+      btn.innerText = "⏸ Streaming";
+    } else {
+      alert("Failed to start stream: " + result.message);
+      btn.disabled = false;
+      btn.innerText = "▶️ Start Streaming";
+    }
+  } catch (err) {
+    alert("Error starting stream: " + err.message);
+    btn.disabled = false;
+    btn.innerText = "▶️ Start Streaming";
+  }
+}
+
+
+
+async function stopStreaming() {
+  const btn = document.getElementById('stopStreamBtn');
+  btn.disabled = true;
+  btn.innerText = "⏳ Stopping...";
+
+  try {
+    const response = await fetch('/stop-stream', { method: 'POST' });
+    const result = await response.json(); // <-- parse JSON here
+
+    if (result.success) {
+      document.getElementById('startStreamBtn').disabled = false;
+      document.getElementById('stopStreamBtn').disabled = true;
+      console.log("Streaming stopped");
+      btn.innerText = "⏹ Stopped";
+    } else {
+      alert("Failed to stop stream: " + result.message);
+      btn.disabled = false;
+      btn.innerText = "⏹ Stop Streaming";
+    }
+  } catch (err) {
+    alert("Error stopping stream: " + err.message);
+    btn.disabled = false;
+    btn.innerText = "⏹ Stop Streaming";
+  }
+}
+
+
+
+async function refreshStatus() {
+  try {
+    const response = await fetch('/stream-status');
+    const data = await response.json();
+
+    // Update uptime
+    document.getElementById('uptime').textContent = data.uptime || '00:00:00';
+
+    // Update bitrate/FPS
+    document.getElementById('bitrateInfo').textContent = data.bitrate || 'N/A';
+
+    // Button toggle logic
+    document.getElementById('startStreamBtn').disabled = data.isStreaming;
+    document.getElementById('stopStreamBtn').disabled = !data.isStreaming;
+
+  } catch (err) {
+    console.error('Error fetching stream status:', err);
+  }
+}
+
+
+function updateStreamingStatus(isStreaming) {
+  const statusEl = document.getElementById('streamingStatus');
+  statusEl.classList.remove('text-red-600', 'text-green-600');
+  statusEl.classList.add(isStreaming ? 'text-green-600' : 'text-red-600');
+  statusEl.innerHTML = `
+    <div class="w-3 h-3 ${isStreaming ? 'bg-green-600' : 'bg-red-600'} rounded-full animate-pulse"></div>
+    <span>${isStreaming ? 'Streaming Live' : 'Streaming Stopped'}</span>
+  `;
+}
+
+function updateStreamConfiguration() {
+  const url = document.getElementById('customStreamUrl').value;
+  const key = document.getElementById('playlistStreamKey').value;
+
+  if (!url || !key) {
+    alert('Stream URL and Key are required!');
+    return;
+  }
+
+  // Proceed to update OBS stream config
 }

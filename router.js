@@ -47,6 +47,12 @@ const router = function (req, res) {
     return playlistsRoutes(req,res);
   }else if  (req.url.startsWith('/api/playlist/check')){
     return playlistsRoutes(req,res);
+  }else if  (req.url.startsWith('/start-stream')){
+    return obsRoutes(req,res);
+  } else if (req.method === 'POST' && req.url === '/start-stream') {
+    return obsRoutes(req, res);
+  } else if (req.method === 'POST' && req.url === '/stop-stream') {
+    return obsRoutes(req, res);
   }else {
     res.writeHead(404);
     res.end('Not Found');

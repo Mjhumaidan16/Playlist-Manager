@@ -3,7 +3,7 @@ const path = require('path');
 const ffmpeg = require('fluent-ffmpeg');
 
 const playlistsDir = path.join(__dirname, '../../playlists');
-const m3u8FilePath = path.join(playlistsDir, 'playlist.m3u8');
+const m3u8FilePath = path.join(playlistsDir, 'playlist.m3u8'); //will need to be updated to nandel more than one file .m3u8
 
 // Utility to read filenames from .m3u8 (ignores comments and metadata)
 function getM3u8FileNames(filePath) {

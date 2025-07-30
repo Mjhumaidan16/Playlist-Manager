@@ -2,16 +2,17 @@ const obsService = require('../services/obsService');
 
 exports.switchScene = async (req, res) => {
   let body = '';
-  req.on('data', chunk => body += chunk);
+ req.on('data', chunk => body += chunk);
   req.on('end', async () => {
     try {
-      const { scene, password } = JSON.parse(body);
-      if (!scene || !password) {
+      const { scene } = JSON.parse(body);
+
+      if (!scene) {
         res.writeHead(400);
-        return res.end('Missing scene or password');
+        return res.end('Missing scene');
       }
 
-      await obsService.connectOBS(password);
+      await obsService.connectOBS();
       await obsService.switchScene(scene);
 
       res.writeHead(200);
@@ -25,24 +26,30 @@ exports.switchScene = async (req, res) => {
 };
 
 
-exports.connectOBS = async (req, res) => {
-  let body = '';
-  req.on('data', chunk => body += chunk);
-  req.on('end', async () => {
-    try {
-      const { scene, password } = JSON.parse(body);
-      if (!scene || !password) {
-        res.writeHead(400);
-        return res.end('Missing scene or password');
-      }
+exports.startStream = async (req, res) => {
+  try {
+    await obsService.startStream();
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ success: true, message: 'Streaming started successfully' }));
 
-      await obsService.connectOBS(password);
+  } catch (err) {
+    console.error('Start stream error:', err);
+    res.writeHead(500, { 'Content-Type': 'application/json' });
+res.end(JSON.stringify({ success: false, message: err.message }));
 
-    }  catch (err) {
-      console.error('Controller error:', err);
-      res.writeHead(500);
-      res.end('Failed to switch scene');
-    }
-  });
+  }
+};
+
+
+exports.stopStream = async (req, res) => {
+  try {
+    await obsService.stopStream();
+     res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ success: true, message: 'Streaming stopped successfully' }));
+  } catch (err) {
+    console.error('Stop stream error:', err);
+    res.writeHead(500, { 'Content-Type': 'application/json' });
+res.end(JSON.stringify({ success: false, message: err.message }));;
+  }
 };
 
