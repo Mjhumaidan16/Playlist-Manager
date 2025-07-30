@@ -1,0 +1,13 @@
+// obsRoute.js
+const obsController = require('../controllers/obsController');
+
+module.exports = async function handleObsRoutes(req, res) {
+
+    
+  if (req.method === 'POST' && req.url === '/switch-scene') {
+    return obsController.switchScene(req, res);
+  } else if (req.method === 'POST' && req.url === '/api/obs-password') {
+    return obsController.connectOBS(req,res);
+  }
+};
+
