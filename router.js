@@ -53,6 +53,8 @@ const router = function (req, res) {
     return obsRoutes(req, res);
   } else if (req.method === 'POST' && req.url === '/stop-stream') {
     return obsRoutes(req, res);
+  } else if ((req.method === 'POST' || req.method === 'GET') && req.url === '/api/stream/status') {
+  return obsRoutes(req, res);
   }else {
     res.writeHead(404);
     res.end('Not Found');

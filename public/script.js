@@ -249,79 +249,85 @@ function switchScene(scene) {
 
 
 async function startStreaming() {
-  const btn = document.getElementById('startStreamBtn');
+  const startBtn = document.getElementById('startStreamBtn');
+  const stopBtn = document.getElementById('stopStreamBtn');
+
+  startBtn.disabled = true;
+  startBtn.innerText = "⏳ Starting...";
+  stopBtn.disabled = true; // just in case
 
   try {
     const response = await fetch('/start-stream', { method: 'POST' });
-    const result = await response.json(); // <-- parse JSON here
-     btn.disabled = true;
-    btn.innerText = "⏳ Starting...";
+    const result = await response.json();
+
     if (result.success) {
-      document.getElementById('startStreamBtn').disabled = true;
-      document.getElementById('stopStreamBtn').disabled = false;
+      startBtn.innerText = "⏸ Streaming";
+      stopBtn.disabled = false;
       console.log("Streaming started");
-      btn.innerText = "⏸ Streaming";
     } else {
       alert("Failed to start stream: " + result.message);
-      btn.disabled = false;
-      btn.innerText = "▶️ Start Streaming";
+      startBtn.disabled = false;
+      startBtn.innerText = "▶️ Start Streaming";
     }
   } catch (err) {
     alert("Error starting stream: " + err.message);
-    btn.disabled = false;
-    btn.innerText = "▶️ Start Streaming";
+    startBtn.disabled = false;
+    startBtn.innerText = "▶️ Start Streaming";
   }
 }
-
 
 
 async function stopStreaming() {
-  const btn = document.getElementById('stopStreamBtn');
-  btn.disabled = true;
-  btn.innerText = "⏳ Stopping...";
+  const stopBtn = document.getElementById('stopStreamBtn');
+  const startBtn = document.getElementById('startStreamBtn');
+
+  stopBtn.disabled = true;
+  stopBtn.innerText = "⏳ Stopping...";
+  startBtn.disabled = true;
 
   try {
     const response = await fetch('/stop-stream', { method: 'POST' });
-    const result = await response.json(); // <-- parse JSON here
+    const result = await response.json();
 
     if (result.success) {
-      document.getElementById('startStreamBtn').disabled = false;
-      document.getElementById('stopStreamBtn').disabled = true;
+      stopBtn.innerText = "⏹ Stop Streaming";
+      startBtn.innerText = "▶️ Start Streaming";
+      startBtn.disabled = false;
       console.log("Streaming stopped");
-      btn.innerText = "⏹ Stopped";
     } else {
       alert("Failed to stop stream: " + result.message);
-      btn.disabled = false;
-      btn.innerText = "⏹ Stop Streaming";
+      stopBtn.disabled = false;
+      stopBtn.innerText = "⏹ Stop Streaming";
     }
   } catch (err) {
     alert("Error stopping stream: " + err.message);
-    btn.disabled = false;
-    btn.innerText = "⏹ Stop Streaming";
+    stopBtn.disabled = false;
+    stopBtn.innerText = "⏹ Stop Streaming";
   }
 }
+
 
 
 
 async function refreshStatus() {
   try {
-    const response = await fetch('/stream-status');
+    const response = await fetch('/api/stream/status');
     const data = await response.json();
-
+     console.log(data); // Optional: Debug log
     // Update uptime
     document.getElementById('uptime').textContent = data.uptime || '00:00:00';
 
     // Update bitrate/FPS
     document.getElementById('bitrateInfo').textContent = data.bitrate || 'N/A';
 
-    // Button toggle logic
-    document.getElementById('startStreamBtn').disabled = data.isStreaming;
-    document.getElementById('stopStreamBtn').disabled = !data.isStreaming;
 
   } catch (err) {
     console.error('Error fetching stream status:', err);
   }
 }
+
+setInterval(refreshStatus, 3000); // every 3 seconds
+
 
 
 function updateStreamingStatus(isStreaming) {

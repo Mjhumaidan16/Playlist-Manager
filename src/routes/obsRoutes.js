@@ -10,6 +10,8 @@ module.exports = async function handleObsRoutes(req, res) {
     return obsController.startStream(req, res);
   } else if (req.method === 'POST' && req.url === '/stop-stream') {
     return obsController.stopStream(req, res);
+  }else if ((req.method === 'POST' || req.method === 'GET') && req.url === '/api/stream/status') {
+  return obsController.streamStatus(req, res);
 }
 };
 

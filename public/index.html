@@ -120,7 +120,7 @@
   <!-- Buttons -->
   <div class="flex flex-wrap gap-4">
     <button id="startStreamBtn" onclick="startStreaming()"
-            class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded">
+            class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded disabled:opacity-50">
       ▶️ Start Streaming
     </button>
 
@@ -144,7 +144,7 @@
 
     <!-- Bitrate / FPS -->
     <div class="items-center p-2 border rounded bg-gray-100 shadow-sm">
-      <span class="text-sm font-semibold text-gray-600">📈 Bitrate / FPS</span>
+      <span class="text-sm font-semibold text-gray-600">📈 Bitrate</span>
       <span id="bitrateInfo" class="text-lg font-bold text-gray-800">N/A</span>
     </div>
   </div>

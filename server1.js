@@ -1,24 +1,46 @@
 const http = require('http');
 const router = require('./router');
 const { PORT } = require('./config');
-require('dotenv').config();
 const readline = require('readline');
+const fs = require('fs');
+
 
 // Terminal prompt setup
 const rl = readline.createInterface({
   input: process.stdin,
   output: process.stdout
 });
-
-// Prompt user for Stream URL and Stream Key
+// Prompt user for Stream URL
 rl.question('Enter your Stream URL: ', (streamUrl) => {
-  streamUrl = process.env.STREAM_URL;
-  rl.question('Enter your Stream Key: ', async (streamKey) => {
-  streamKey = process.env.STREAM_Key;
-    rl.close(); // close prompt
+  // Prompt user for Stream Key
+  rl.question('Enter your Stream Key: ', (streamKey) => {
+    rl.close(); // Close readline interface after both inputs
 
-        console.log('✅ OBS stream settings applied.');
+    // Read the existing .env file to preserve other variables
+    let envContent = fs.readFileSync('.env', 'utf8');
 
+    // Update or append the new values to the .env content
+    const streamUrlRegex = /STREAM_URL=.*/;
+    const streamKeyRegex = /STREAM_KEY=.*/;
+
+    if (streamUrlRegex.test(envContent)) {
+      envContent = envContent.replace(streamUrlRegex, `STREAM_URL=${streamUrl}\n`);
+    } else {
+      envContent += `STREAM_URL=${streamUrl}\n`;
+    }
+
+    if (streamKeyRegex.test(envContent)) {
+      envContent = envContent.replace(streamKeyRegex, `STREAM_KEY=${streamKey}`);
+    } else {
+      envContent += `STREAM_KEY=${streamKey}\n`;
+    }
+
+    // Write the updated content back to the .env file without overwriting the whole file
+    fs.writeFileSync('.env', envContent, 'utf8');
+
+    console.log('✅ OBS stream settings applied and saved to .env file.');
+    
+    require('dotenv').config();
 
 const server = http.createServer((req, res) => {
   router(req, res);

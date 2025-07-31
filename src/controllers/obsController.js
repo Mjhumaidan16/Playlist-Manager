@@ -53,3 +53,19 @@ res.end(JSON.stringify({ success: false, message: err.message }));;
   }
 };
 
+
+exports.streamStatus = async (req, res) => {
+  try {
+    const status = await obsService.streamStatus(); // <-- get actual status data
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify(status)); // <-- return it to the frontend
+  } catch (err) {
+    console.error('Stream status error:', err);
+    res.writeHead(500, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ success: false, message: err.message }));
+  }
+};
+
+
+
+
