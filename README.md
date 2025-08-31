@@ -5,13 +5,13 @@ Features include starting/stopping streams, switching scenes, monitoring stream 
 
 Table of Contents
 
-Features
-Requirements
-Usage
-Project Structure
+# Features
+# Requirements
+# Usage
+# Project Structure
 
 
-#Features
+# Features
 
 ✅ Start and stop OBS streams remotely
 
@@ -23,7 +23,7 @@ Project Structure
 
 ✅ Securely store stream keys and OBS passwords using .env
 
-#Requirements
+# Requirements
 
 Node.js >= 18
 npm
@@ -31,7 +31,7 @@ OBS Studio with WebSocket Plugin (v5+)
 YouTube/RTMP streaming account (for live streams)
 
 
-#Usage
+# Usage
 
 Start OBS with WebSocket enabled.
 
@@ -54,7 +54,7 @@ Start / Stop stream
 Switch scenes
 
 
-#Project Structure
+# Project Structure
 
 src/
 ├─ controllers/        # Request handlers for OBS and playlist actions
