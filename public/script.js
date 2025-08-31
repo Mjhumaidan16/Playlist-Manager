@@ -326,7 +326,7 @@ async function refreshStatus() {
   }
 }
 
-setInterval(refreshStatus, 3000); // every 3 seconds
+//setInterval(refreshStatus, 3000); // every 3 seconds
 
 
 
