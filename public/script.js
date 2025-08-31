@@ -348,6 +348,5 @@ function updateStreamConfiguration() {
     alert('Stream URL and Key are required!');
     return;
   }
-
-  // Proceed to update OBS stream config
+  
 }
